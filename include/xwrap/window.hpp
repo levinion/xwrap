@@ -1,6 +1,7 @@
 #include <opencv2/opencv.hpp>
 #include <X11/X.h>
 #include <X11/Xlib.h>
+#include <X11/extensions/XShm.h>
 #include <X11/extensions/Xdamage.h>
 #include <string>
 #include <vector>
@@ -49,7 +50,7 @@ public:
 
 private:
   XImage* get_x11_image();
-  XImage* get_xshm_image(int x, int y, unsigned int width, unsigned int height);
+  XImage* get_xshm_image(XImage* image);
 };
 
 } // namespace xwrap
