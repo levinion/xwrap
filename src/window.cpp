@@ -1,4 +1,5 @@
 #include <mutex>
+#include <opencv2/core/mat.hpp>
 #include <opencv2/highgui.hpp>
 #include <X11/extensions/composite.h>
 #include <X11/extensions/damagewire.h>
@@ -23,6 +24,7 @@
 #include <sys/shm.h>
 
 namespace xwrap {
+
 XwrapWindow XwrapWindow::from_focused(Display* display) {
   Window focused;
   int unknown;
@@ -128,26 +130,6 @@ std::vector<XwrapWindow> XwrapWindow::get_children() {
     v.push_back(XwrapWindow { display, child });
   }
   return v;
-}
-
-} // namespace xwrap
-
-namespace xwrap {
-XwrapPixel XwrapImage::get_pixel(int x, int y) {
-  auto pixel = image->at<cv::Vec3b>(y, x);
-  auto b = (float)pixel[0];
-  auto g = (float)pixel[1];
-  auto r = (float)pixel[2];
-  return XwrapPixel { r, g, b };
-}
-
-void XwrapImage::show() {
-  cv::imshow("Demo", *image);
-  while (1) {
-    auto k = cv::waitKey(0);
-    if (k == 'q')
-      break;
-  }
 }
 
 } // namespace xwrap

@@ -10,7 +10,6 @@
 #include <opencv2/core/utility.hpp>
 #include <tasklet/tasklet.hpp>
 
-// TODO: get this function work
 namespace xwrap {
 void XwrapWindow::get_xshm_image() {
   XShmGetImage(display, window, image, 0, 0, AllPlanes);
@@ -18,16 +17,19 @@ void XwrapWindow::get_xshm_image() {
 
 void XwrapWindow::begin_get_image() {
   int screen = DefaultScreen(display);
-  auto attributes = this->get_attributes();
+  auto attr = this->get_attributes();
+
+  mat = cv::Mat(attr.height, attr.width, CV_8UC3);
+
   auto image = XShmCreateImage(
     display,
-    attributes.visual,
-    attributes.depth,
+    attr.visual,
+    attr.depth,
     ZPixmap,
     NULL,
     &shminfo,
-    attributes.width,
-    attributes.height
+    attr.width,
+    attr.height
   );
 
   shminfo.shmid = shmget(
@@ -57,24 +59,28 @@ XwrapImage XwrapWindow::get_image() {
 
   // Get Mat
   auto attr = this->get_attributes();
-  static cv::Mat mat = cv::Mat(attr.height, attr.width, CV_8UC3);
 
-  cv::parallel_for_(
-    cv::Range(0, attr.width),
-    cv::ParallelLoopBodyLambdaWrapper([&](const cv::Range& range) {
-      for (int x = range.start; x < range.end; ++x) {
-        for (int y = 0; y < attr.height; ++y) {
-          auto pixel = XGetPixel(image, x, y);
-          unsigned char blue = pixel & image->blue_mask;
-          unsigned char green = (pixel & image->green_mask) >> 8;
-          unsigned char red = (pixel & image->red_mask) >> 16;
-          mat.at<cv::Vec3b>(y, x) = { blue, green, red };
-        }
-      }
-    })
-  );
+  // cv::parallel_for_(
+  //   cv::Range(0, attr.width),
+  //   cv::ParallelLoopBodyLambdaWrapper([&](const cv::Range& range) {
+  //     for (int x = range.start; x < range.end; ++x) {
+  //       for (int y = 0; y < attr.height; ++y) {
+  //         auto pixel = XGetPixel(image, x, y);
+  //         unsigned char blue = pixel & image->blue_mask;
+  //         unsigned char green = (pixel & image->green_mask) >> 8;
+  //         unsigned char red = (pixel & image->red_mask) >> 16;
+  //         *mat.ptr<cv::Vec3b>(y, x) = { blue, green, red };
+  //       }
+  //     }
+  //   })
+  // );
 
-  return XwrapImage { &mat };
+  XwrapImage xim;
+  xim.pixels = image->data;
+  xim.height = image->height;
+  xim.width = image->width;
+
+  return xim;
 }
 
 } // namespace xwrap

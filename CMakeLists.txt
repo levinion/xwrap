@@ -28,9 +28,3 @@ target_link_libraries(${name} PUBLIC X11::Xcomposite)
 target_link_libraries(${name} PUBLIC X11::Xfixes)
 target_link_libraries(${name} PUBLIC X11::Xdamage)
 target_link_libraries(${name} PUBLIC X11::Xtst)
-
-find_package(OpenCV REQUIRED)
-target_link_libraries(${name} PUBLIC ${OpenCV_LIBRARIES})
-
-add_subdirectory(./vendor/tasklet)
-target_link_libraries(${name} PUBLIC tasklet)

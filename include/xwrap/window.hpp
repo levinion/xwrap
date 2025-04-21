@@ -1,3 +1,4 @@
+#include <opencv2/core/mat.hpp>
 #include <opencv2/opencv.hpp>
 #include <X11/X.h>
 #include <X11/Xlib.h>
@@ -5,21 +6,15 @@
 #include <X11/extensions/Xdamage.h>
 #include <string>
 #include <vector>
-#include "display.hpp"
+#include "xwrap/display.hpp"
 #include "keys.hpp"
+#include "xwrap/image.hpp"
 
 namespace xwrap {
 
 class XwrapPixel {
 public:
   float r, g, b;
-};
-
-class XwrapImage {
-public:
-  cv::Mat* image;
-  XwrapPixel get_pixel(int x, int y);
-  void show();
 };
 
 class XwrapWindow {
@@ -52,6 +47,7 @@ public:
 
   XShmSegmentInfo shminfo;
   XImage* image;
+  cv::Mat mat;
 
 private:
   void get_xshm_image();
