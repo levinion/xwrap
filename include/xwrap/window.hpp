@@ -31,7 +31,9 @@ public:
   static XwrapWindow from_root(Display* display);
   std::string get_name();
   XWindowAttributes get_attributes();
+  void begin_get_image();
   XwrapImage get_image();
+  void end_get_image();
   void set_override_redirect();
   void allow_passthrough();
   void unmap();
@@ -48,9 +50,11 @@ public:
   void set_cursor_relative_position(int xrel, int yrel);
   void send_mouse_wheel(float y);
 
-private:
-  XImage* get_x11_image();
-  XImage* get_xshm_image(XImage* image);
-};
+  XShmSegmentInfo shminfo;
+  XImage* image;
 
+private:
+  void get_xshm_image();
+  XImage* get_x11_image();
+};
 } // namespace xwrap
