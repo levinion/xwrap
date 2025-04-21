@@ -7,6 +7,7 @@
 #include <X11/extensions/XShm.h>
 #include <cassert>
 #include "xwrap/utils.hpp"
+#include <opencv2/core/utility.hpp>
 #include <tasklet/tasklet.hpp>
 
 // TODO: get this function work
@@ -56,29 +57,24 @@ XwrapImage XwrapWindow::get_image() {
 
   // Get Mat
   auto attr = this->get_attributes();
-  auto mat = cv::Mat(attr.height, attr.width, CV_8UC3);
+  static cv::Mat mat = cv::Mat(attr.height, attr.width, CV_8UC3);
 
-  // auto pool = tasklet::ThreadPool();
-
-  // split by parts
-  auto parts = 1;
-  for (int i = 0; i < parts; i++) {
-    // pool.add_task([=, &mat, this]() {
-    for (int x = attr.width * i / parts; x < attr.width * (i + 1) / parts;
-         x++) {
-      for (int y = 0; y < attr.height; y++) {
-        auto pixel = XGetPixel(image, x, y);
-        unsigned char blue = pixel & image->blue_mask;
-        unsigned char green = (pixel & image->green_mask) >> 8;
-        unsigned char red = (pixel & image->red_mask) >> 16;
-        mat.at<cv::Vec3b>(y, x) = { blue, green, red };
+  cv::parallel_for_(
+    cv::Range(0, attr.width),
+    cv::ParallelLoopBodyLambdaWrapper([&](const cv::Range& range) {
+      for (int x = range.start; x < range.end; ++x) {
+        for (int y = 0; y < attr.height; ++y) {
+          auto pixel = XGetPixel(image, x, y);
+          unsigned char blue = pixel & image->blue_mask;
+          unsigned char green = (pixel & image->green_mask) >> 8;
+          unsigned char red = (pixel & image->red_mask) >> 16;
+          mat.at<cv::Vec3b>(y, x) = { blue, green, red };
+        }
       }
-    }
-    // });
-  }
-  // pool.wait();
+    })
+  );
 
-  return XwrapImage { mat };
+  return XwrapImage { &mat };
 }
 
 } // namespace xwrap

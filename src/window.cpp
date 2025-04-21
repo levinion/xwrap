@@ -134,7 +134,7 @@ std::vector<XwrapWindow> XwrapWindow::get_children() {
 
 namespace xwrap {
 XwrapPixel XwrapImage::get_pixel(int x, int y) {
-  auto pixel = image.at<cv::Vec3b>(y, x);
+  auto pixel = image->at<cv::Vec3b>(y, x);
   auto b = (float)pixel[0];
   auto g = (float)pixel[1];
   auto r = (float)pixel[2];
@@ -142,7 +142,7 @@ XwrapPixel XwrapImage::get_pixel(int x, int y) {
 }
 
 void XwrapImage::show() {
-  cv::imshow("Demo", image);
+  cv::imshow("Demo", *image);
   while (1) {
     auto k = cv::waitKey(0);
     if (k == 'q')

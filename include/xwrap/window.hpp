@@ -17,7 +17,7 @@ public:
 
 class XwrapImage {
 public:
-  cv::Mat image;
+  cv::Mat* image;
   XwrapPixel get_pixel(int x, int y);
   void show();
 };
