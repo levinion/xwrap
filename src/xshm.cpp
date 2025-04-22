@@ -7,8 +7,6 @@
 #include <X11/extensions/XShm.h>
 #include <cassert>
 #include "xwrap/utils.hpp"
-#include <opencv2/core/utility.hpp>
-#include <tasklet/tasklet.hpp>
 
 namespace xwrap {
 void XwrapWindow::get_xshm_image() {
@@ -18,8 +16,6 @@ void XwrapWindow::get_xshm_image() {
 void XwrapWindow::begin_get_image() {
   int screen = DefaultScreen(display);
   auto attr = this->get_attributes();
-
-  mat = cv::Mat(attr.height, attr.width, CV_8UC3);
 
   auto image = XShmCreateImage(
     display,

@@ -1,6 +1,4 @@
 #include <mutex>
-#include <opencv2/core/mat.hpp>
-#include <opencv2/highgui.hpp>
 #include <X11/extensions/composite.h>
 #include <X11/extensions/damagewire.h>
 #include <X11/extensions/shapeconst.h>
@@ -13,7 +11,6 @@
 #include <string>
 #include <thread>
 #include <vector>
-#include "tasklet/tasklet.hpp"
 #include <xwrap/utils.hpp>
 #include <X11/extensions/Xcomposite.h>
 #include <X11/extensions/XShm.h>
