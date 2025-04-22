@@ -1,5 +1,3 @@
-#include <opencv2/core/mat.hpp>
-#include <opencv2/opencv.hpp>
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/extensions/XShm.h>
@@ -47,7 +45,6 @@ public:
 
   XShmSegmentInfo shminfo;
   XImage* image;
-  cv::Mat mat;
 
 private:
   void get_xshm_image();
