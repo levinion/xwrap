@@ -2,11 +2,12 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <X11/extensions/Xdamage.h>
+#include <X11/extensions/damagewire.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <X11/extensions/XShm.h>
 #include <cassert>
-#include "xwrap/utils.hpp"
 
 namespace xwrap {
 void XwrapWindow::get_xshm_image() {
@@ -16,6 +17,10 @@ void XwrapWindow::get_xshm_image() {
 void XwrapWindow::begin_get_image() {
   int screen = DefaultScreen(display);
   auto attr = this->get_attributes();
+
+  XDamageQueryExtension(display, &damage_event, &damage_error);
+
+  damage = XDamageCreate(display, window, XDamageReportNonEmpty);
 
   auto image = XShmCreateImage(
     display,
@@ -56,27 +61,21 @@ XwrapImage XwrapWindow::get_image() {
   // Get Mat
   auto attr = this->get_attributes();
 
-  // cv::parallel_for_(
-  //   cv::Range(0, attr.width),
-  //   cv::ParallelLoopBodyLambdaWrapper([&](const cv::Range& range) {
-  //     for (int x = range.start; x < range.end; ++x) {
-  //       for (int y = 0; y < attr.height; ++y) {
-  //         auto pixel = XGetPixel(image, x, y);
-  //         unsigned char blue = pixel & image->blue_mask;
-  //         unsigned char green = (pixel & image->green_mask) >> 8;
-  //         unsigned char red = (pixel & image->red_mask) >> 16;
-  //         *mat.ptr<cv::Vec3b>(y, x) = { blue, green, red };
-  //       }
-  //     }
-  //   })
-  // );
-
   XwrapImage xim;
   xim.pixels = image->data;
   xim.height = image->height;
   xim.width = image->width;
 
   return xim;
+}
+
+std::optional<XwrapImage> XwrapWindow::try_get_image() {
+  XEvent event;
+  XNextEvent(display, &event);
+  if (event.type == damage_event + XDamageNotify) {
+    return this->get_image();
+  }
+  return {};
 }
 
 } // namespace xwrap

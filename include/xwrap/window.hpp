@@ -1,7 +1,10 @@
+#pragma once
+
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/extensions/XShm.h>
 #include <X11/extensions/Xdamage.h>
+#include <optional>
 #include <string>
 #include <vector>
 #include "xwrap/display.hpp"
@@ -26,6 +29,7 @@ public:
   XWindowAttributes get_attributes();
   void begin_get_image();
   XwrapImage get_image();
+  std::optional<XwrapImage> try_get_image();
   void end_get_image();
   void set_override_redirect();
   void allow_passthrough();
@@ -45,6 +49,10 @@ public:
 
   XShmSegmentInfo shminfo;
   XImage* image;
+  Damage damage;
+
+  int damage_event;
+  int damage_error;
 
 private:
   void get_xshm_image();

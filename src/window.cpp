@@ -11,7 +11,6 @@
 #include <string>
 #include <thread>
 #include <vector>
-#include <xwrap/utils.hpp>
 #include <X11/extensions/Xcomposite.h>
 #include <X11/extensions/XShm.h>
 #include <X11/extensions/Xfixes.h>
